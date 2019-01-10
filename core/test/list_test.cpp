@@ -7,52 +7,49 @@ using namespace ess_alg::core;
 
 namespace
 {
-    std::string to_string(const std::vector<int>& lf)
+    std::ostream& operator<< (std::ostream &out, const std::vector<int>& obj)
     {
-        std::string result("{");
-        for(auto i = 0; i < lf.size(); ++i)
+        out << "{";
+        for(auto i = 0; i < obj.size(); ++i)
         {
-            result += std::to_string(lf[i]);
-            if(i + 1 < lf.size())
-                result += ",";
+            out << obj[i];
+            if(i + 1 < obj.size())
+                out << ",";
         }
-        result +="}";
-        return result;
+        out << "}";
+        return out;
     }
     
-    std::string to_string(const ListControl& list)
+    std::ostream& operator<< (std::ostream &out, const ListControl& obj)
     {
-        std::string result("{");
-        auto current = list.GetBegin()->m_next;
-        while(current != list.GetEnd())
+        out << "{";
+        auto current = obj.GetBegin()->m_next;
+        while(current != obj.GetEnd())
         {
-            result += std::to_string(current->m_data);
-            if(current->m_next != list.GetEnd())
-                result += ",";
+            out << current->m_data;
+            if(current->m_next != obj.GetEnd())
+                out << ",";
             current = current->m_next;
         }
-        result +="}";
-        return result;
+        out << "}";
+        return out;
     }
     
-    bool ListEq(const std::vector<int>& lf, const ListControl& list)
+    bool Equal(const std::vector<int>& left, const ListControl& right)
     {
-        auto current = list.GetBegin()->m_next;
-        for(const auto& element: lf)
+        auto current = right.GetBegin()->m_next;
+        for(const auto& element: left)
         {
-            if(current == list.GetEnd() || element != current->m_data)
+            if(current == right.GetEnd() || element != current->m_data)
+            {
+                std::cout << "Equal:"  << std::endl
+                          << " Left: " << left << std::endl
+                          << "Right: " << right << std::endl;
                 return false;
+            }
             current = current->m_next;
         }
         return true;
-    }
-    
-    bool ListEqEx(const std::vector<int>& lf, const ListControl& list)
-    {
-        if(ListEq(lf, list))
-            return true;
-        std::cout<< to_string(lf) << " not equal " << to_string(list) << std::endl;
-        return false;
     }
 }
 
@@ -87,7 +84,7 @@ TEST_F(ListControl_test, InsertBack)
 {
     ListControl list;
     list.InsertBack(1);
-    ASSERT_TRUE(ListEqEx({1}, list));
+    ASSERT_TRUE(Equal({1}, list));
 }
 
 TEST_F(ListControl_test, InsertFront)
@@ -95,7 +92,7 @@ TEST_F(ListControl_test, InsertFront)
     ListControl list;
     list.InsertBack(1);
     list.InsertFront(2);
-    ASSERT_TRUE(ListEqEx({2, 1}, list));
+    ASSERT_TRUE(Equal({2, 1}, list));
 }
 
 TEST_F(ListControl_test, Clear)
@@ -112,19 +109,19 @@ TEST_F(ListControl_test, InsertBack_Data)
 {
     ListControl list;
     list.InsertBack(new ListData(1));
-    ASSERT_TRUE(ListEqEx({1}, list));
+    ASSERT_TRUE(Equal({1}, list));
 }
 
 TEST_F(ListControl_test, Initializer_list_Int)
 {
     ListControl list({1,2});
-    ASSERT_TRUE(ListEqEx({1, 2}, list));
+    ASSERT_TRUE(Equal({1, 2}, list));
 }
 
 TEST_F(ListControl_test, Initializer_list_Data)
 {
     ListControl list({new ListData(1), new ListData(2)});
-    ASSERT_TRUE(ListEqEx({1, 2}, list));
+    ASSERT_TRUE(Equal({1, 2}, list));
 }
 
 TEST_F(ListControl_test, SortSelect_Empty)
@@ -139,14 +136,14 @@ TEST_F(ListControl_test, SortSelect_1)
 {
     ListControl list({4,3,2,1});
     list.SortSelect();
-    ASSERT_TRUE(ListEqEx({1,2,3,4}, list));
+    ASSERT_TRUE(Equal({1,2,3,4}, list));
 }
 
 TEST_F(ListControl_test, SortSelect_2)
 {
     ListControl list({0,-1,2,-1});
     list.SortSelect();
-    ASSERT_TRUE(ListEqEx({-1,-1,0,2}, list));
+    ASSERT_TRUE(Equal({-1,-1,0,2}, list));
 }
 
 TEST_F(ListControl_test, SortInsertable_Empty)
@@ -161,14 +158,14 @@ TEST_F(ListControl_test, SortInsertable_1)
 {
     ListControl list({4,3,2,1});
     list.SortInsertable();
-    ASSERT_TRUE(ListEqEx({1,2,3,4}, list));
+    ASSERT_TRUE(Equal({1,2,3,4}, list));
 }
 
 TEST_F(ListControl_test, SortInsertable_2)
 {
     ListControl list({0,-1,2,-1});
     list.SortInsertable();
-    ASSERT_TRUE(ListEqEx({-1,-1,0,2}, list));
+    ASSERT_TRUE(Equal({-1,-1,0,2}, list));
 }
 /* TODO need tests
 
