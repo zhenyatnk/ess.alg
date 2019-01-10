@@ -22,6 +22,8 @@ class ESS_ALG_CORE_EXPORT ListControl final
 {
 public:
     ListControl();
+    ListControl(std::initializer_list<ListData*> initializer);
+    ListControl(std::initializer_list<int> initializer);
     ListControl(ListControl && other);
     ListControl& operator=(ListControl&& other);
     

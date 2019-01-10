@@ -16,7 +16,21 @@ ListControl::ListControl()
     m_begin = new ListData();
     m_begin->m_next = m_end = new ListData();
 }
-        
+    
+ListControl::ListControl(std::initializer_list<ListData*> initializer)
+    :ListControl()
+{
+    for(const auto& element: initializer)
+        InsertBack(element);
+}
+    
+ListControl::ListControl(std::initializer_list<int> initializer)
+    :ListControl()
+{
+    for(const auto& element: initializer)
+        InsertBack(element);
+}
+    
 ListControl::ListControl(ListControl && other)
 {
     m_begin = other.m_begin;
