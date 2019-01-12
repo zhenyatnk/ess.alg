@@ -237,6 +237,5 @@ bool isCycle() const;
 bool isCycleR();
 
 void RemoveCycle();
-ListData * FindMax() const; //O(N)
 
 */

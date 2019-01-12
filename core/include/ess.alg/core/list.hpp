@@ -4,6 +4,7 @@
 #include <ess.alg/core/export.hpp>
 
 #include <functional>
+#include <ostream>
 
 namespace ess_alg {
 namespace core {
@@ -63,7 +64,7 @@ private:
 private:
     ListData *m_begin = nullptr;
     ListData *m_end = nullptr;
-};
-
+};  
+    
 }
 }

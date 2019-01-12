@@ -288,7 +288,6 @@ ListData* ListControl::GetBeforeMaxElement(ListData* begin, ListData* end) const
     return beforMaxElement;
 }
 
-
 void ListControl::FreeMemory()
 {
     Clear();
