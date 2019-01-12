@@ -13,8 +13,7 @@ ListData::ListData(int data)
 ////////////////////////////////////////////
 ListControl::ListControl()
 {
-    m_begin = new ListData();
-    m_begin->m_next = m_end = new ListData();
+    m_begin = m_end = new ListData();
 }
     
 ListControl::ListControl(std::initializer_list<ListData*> initializer)
@@ -36,8 +35,7 @@ ListControl::ListControl(ListControl && other)
     m_begin = other.m_begin;
     m_end = other.m_end;
     
-    other.m_begin = new ListData();
-    other.m_begin->m_next = other.m_end = new ListData();
+    other.m_begin = other.m_end = new ListData();
 }
         
 ListControl& ListControl::operator=(ListControl&& other)
@@ -49,8 +47,7 @@ ListControl& ListControl::operator=(ListControl&& other)
         m_begin = other.m_begin;
         m_end = other.m_end;
         
-        other.m_begin = new ListData();
-        other.m_begin->m_next = other.m_end = new ListData();
+        other.m_begin = other.m_end = new ListData();
     }
     return *this;
 }
@@ -67,12 +64,21 @@ void ListControl::InsertBack(int a)
         
 void ListControl::InsertBack(ListData* data)
 {
-    auto current = m_begin;
-    while(current->m_next != m_end)
-        current = current->m_next;
-    
-    data->m_next = current->m_next;
-    current->m_next = data;
+    if(Empty())
+    {
+        m_begin = data;
+        m_begin->m_next = m_end;
+    }
+    else
+    {
+        auto last = m_begin;
+        while(last->m_next != m_end)
+            last = last->m_next;
+        
+        last->m_next = data;
+        data->m_next = m_end;
+    }
+
 }
 
 void ListControl::InsertFront(int a)
@@ -82,8 +88,8 @@ void ListControl::InsertFront(int a)
 
 void ListControl::InsertFront(ListData* data)
 {
-    data->m_next = m_begin->m_next;
-    m_begin->m_next = data;
+    data->m_next = m_begin;
+    m_begin = data;
 }
 
 ListData * ListControl::GetBegin()
@@ -110,13 +116,10 @@ void ListControl::SortSelect()//O(n^2)
 {
     ListControl resultList;
     
-    if(m_begin->m_next == m_end)
-        return;
-    
-    while(m_begin->m_next != m_end)
+    while(m_begin != m_end)
     {
         auto beforMaxElement = GetBeforeMaxElement(m_begin, m_end);
-        if(!!beforMaxElement)//throw
+        if(!!beforMaxElement)
         {
             auto maxElement = beforMaxElement->m_next;
             
@@ -125,6 +128,15 @@ void ListControl::SortSelect()//O(n^2)
             
             resultList.InsertFront(maxElement);
         }
+        else //max it is begin
+        {
+            auto maxElement = m_begin;
+            m_begin = m_begin->m_next;
+            maxElement->m_next = nullptr;
+            
+            resultList.InsertFront(maxElement);
+        }
+            
     }
     *this = std::move(resultList);
 }
@@ -133,20 +145,26 @@ void ListControl::SortInsertable()//O(n^2)
 {
     ListControl resultList;
     
-    if(m_begin->m_next == m_end)
-        return;
-    
-    while(m_begin->m_next != m_end)
+    while(m_begin != m_end)
     {
-        auto insertable = m_begin->m_next;
-        m_begin->m_next = insertable->m_next;
+        auto insertable = m_begin;
+        m_begin = insertable->m_next;
         
+        ListData* prev = nullptr;
         auto currentRes = resultList.GetBegin();
-        while(currentRes->m_next != resultList.GetEnd() && currentRes->m_next->m_data < insertable->m_data)
+        while(currentRes != resultList.GetEnd() && currentRes->m_data < insertable->m_data)
+        {
+            prev = currentRes;
             currentRes = currentRes->m_next;
+        }
         
-        insertable->m_next = currentRes->m_next;
-        currentRes->m_next = insertable;
+        if(!!prev)
+        {
+            insertable->m_next = prev->m_next;
+            prev->m_next = insertable;
+        }
+        else
+            resultList.InsertFront(insertable);
     }
     *this = std::move(resultList);
 }
@@ -154,17 +172,17 @@ void ListControl::SortInsertable()//O(n^2)
 
 void ListControl::Clear()
 {
-    while(m_begin->m_next != m_end)
+    while(m_begin != m_end)
     {
-        auto delete_current = m_begin->m_next;
-        m_begin->m_next = delete_current->m_next;
+        auto delete_current = m_begin;
+        m_begin = delete_current->m_next;
         delete delete_current;
     }
 }
 
 bool ListControl::Empty() const
 {
-    return m_begin->m_next == m_end;
+    return m_begin == m_end;
 }
 
 bool ListControl::isCycle() const
@@ -172,7 +190,7 @@ bool ListControl::isCycle() const
     if(Empty())
         return false;
     
-    auto current = m_begin->m_next;
+    auto current = m_begin;
     const auto visited = !current->m_visited;
     while(current != m_end)
     {
@@ -189,38 +207,41 @@ bool ListControl::isCycleR()
     if(Empty())
         return false;
     
-    auto reverse = Reverse(m_begin);
-    Reverse(reverse);
-    return (m_begin == reverse);
+    auto reverse = Reverse(m_begin, m_end);
+    Reverse(reverse.first, reverse.second);
+    return (m_begin == reverse.first);
 }
 
 void ListControl::RemoveCycle()
 {
     if(Empty())
         return ;
-    
+    ListData* prev = nullptr;
     auto current = m_begin;
-    const auto visited = !current->m_next->m_visited;
-    while(current->m_next != m_end)
+    const auto visited = !current->m_visited;
+    while(current != m_end)
     {
-        if(current->m_next->m_visited == visited)
+        if(current->m_visited == visited)
             break;
-        current->m_next->m_visited = visited;
+        current->m_visited = visited;
+        prev = current;
         current = current->m_next;
     }
-    if(current->m_next != m_end)
-        current->m_next = m_end;
+    if(current != m_end)
+        prev->m_next = m_end;
 }
 
 void ListControl::Reverse()
 {
-    m_begin = Reverse(m_begin);
+    auto result = Reverse(m_begin, m_end);
+    m_begin = result.first;
+    m_end = result.second;
 }
 
 ListData * ListControl::FindMax() const //O(N)
 {
     ListData *maxElement = m_begin;
-    auto current = m_begin->m_next;
+    auto current = m_begin;
     while(current != m_end)
     {
         if(maxElement->m_data < current->m_data)
@@ -230,11 +251,14 @@ ListData * ListControl::FindMax() const //O(N)
     return maxElement;
 }
 
-ListData* ListControl::Reverse(ListData *begin)
+std::pair<ListData*,ListData*> ListControl::Reverse(ListData *begin, ListData *end)
 {
-    ListData* prev = nullptr;
+    if(Empty())
+        return std::pair<ListData*,ListData*>(begin, end);
+    
+    ListData* prev = end;
     ListData* current = begin;
-    while(current != nullptr)
+    while(current != end)
     {
         auto next = current->m_next;
         current->m_next = prev;
@@ -242,20 +266,23 @@ ListData* ListControl::Reverse(ListData *begin)
         prev = current;
         current = next;
     }
-    return prev;
+    return std::pair<ListData*,ListData*>(prev, end);
 }
 
 ListData* ListControl::GetBeforeMaxElement(ListData* begin, ListData* end) const
 {
-    if(begin->m_next == end)
-        return nullptr;
-    
+    ListData* prev = nullptr;
+    ListData* beforMaxElement = nullptr;
+    ListData *maxElement = begin;
     auto current = begin;
-    auto beforMaxElement = current;
-    while(current->m_next != end)
+    while(current != m_end)
     {
-        if(beforMaxElement->m_next->m_data < current->m_next->m_data)
-            beforMaxElement = current;
+        if(maxElement->m_data < current->m_data)
+        {
+            beforMaxElement = prev;
+            maxElement = current;
+        }
+        prev = current;
         current = current->m_next;
     }
     return beforMaxElement;
@@ -265,7 +292,6 @@ ListData* ListControl::GetBeforeMaxElement(ListData* begin, ListData* end) const
 void ListControl::FreeMemory()
 {
     Clear();
-    delete m_begin;
     delete m_end;
 }
 

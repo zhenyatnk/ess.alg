@@ -54,7 +54,7 @@ public:
     ListData * FindMax() const; //O(N)
     
 protected:
-    ListData* Reverse(ListData *begin);
+    std::pair<ListData*,ListData*> Reverse(ListData *begin, ListData *end);
     ListData* GetBeforeMaxElement(ListData* begin, ListData* end) const;
     
 private:

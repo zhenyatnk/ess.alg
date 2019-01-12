@@ -23,7 +23,7 @@ namespace
     std::ostream& operator<< (std::ostream &out, const ListControl& obj)
     {
         out << "{";
-        auto current = obj.GetBegin()->m_next;
+        auto current = obj.GetBegin();
         while(current != obj.GetEnd())
         {
             out << current->m_data;
@@ -37,7 +37,7 @@ namespace
     
     bool Equal(const std::vector<int>& left, const ListControl& right)
     {
-        auto current = right.GetBegin()->m_next;
+        auto current = right.GetBegin();
         for(const auto& element: left)
         {
             if(current == right.GetEnd() || element != current->m_data)
@@ -64,7 +64,7 @@ public:
 TEST_F(ListControl_test, Ctor_Empty)
 {
     ListControl list;
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
 }
 
 TEST_F(ListControl_test, Empty)
@@ -100,9 +100,9 @@ TEST_F(ListControl_test, Clear)
     ListControl list;
     list.InsertBack(1);
     list.InsertBack(2);
-    ASSERT_NE(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_NE(list.GetBegin(), list.GetEnd());
     list.Clear();
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
 }
 
 TEST_F(ListControl_test, InsertBack_Data)
@@ -127,9 +127,9 @@ TEST_F(ListControl_test, Initializer_list_Data)
 TEST_F(ListControl_test, SortSelect_Empty)
 {
     ListControl list;
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
     list.SortSelect();
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
 }
 
 TEST_F(ListControl_test, SortSelect_1)
@@ -149,9 +149,9 @@ TEST_F(ListControl_test, SortSelect_2)
 TEST_F(ListControl_test, SortInsertable_Empty)
 {
     ListControl list;
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
     list.SortInsertable();
-    ASSERT_EQ(list.GetBegin()->m_next, list.GetEnd());
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
 }
 
 TEST_F(ListControl_test, SortInsertable_1)
@@ -167,13 +167,76 @@ TEST_F(ListControl_test, SortInsertable_2)
     list.SortInsertable();
     ASSERT_TRUE(Equal({-1,-1,0,2}, list));
 }
+
+TEST_F(ListControl_test, Reverse_Empty)
+{
+    ListControl list;
+    list.Reverse();
+    ASSERT_EQ(list.GetBegin(), list.GetEnd());
+}
+
+TEST_F(ListControl_test, Reverse)
+{
+    ListControl list({0,-1,2,-1});
+    list.Reverse();
+    ASSERT_TRUE(Equal({-1,2,-1,0}, list));
+}
+
+TEST_F(ListControl_test, FindMax_Empty)
+{
+    ListControl list;
+    auto max = list.FindMax();
+    ASSERT_EQ(max, list.GetEnd());
+}
+
+TEST_F(ListControl_test, FindMax_One)
+{
+    ListControl list({1});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, 1);
+}
+
+TEST_F(ListControl_test, FindMax_Some)
+{
+    ListControl list({1,4,3});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, 4);
+}
+
+TEST_F(ListControl_test, FindMax_OnlyNegative)
+{
+    ListControl list({-1,-4,-3});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, -1);
+}
+
+TEST_F(ListControl_test, FindMax_Mixed)
+{
+    ListControl list({1,-4,3});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, 3);
+}
+
+TEST_F(ListControl_test, FindMax_First)
+{
+    ListControl list({55,-4,3});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, 55);
+}
+
+TEST_F(ListControl_test, FindMax_Second)
+{
+    ListControl list({1,-4,55});
+    auto max = list.FindMax();
+    ASSERT_EQ(max->m_data, 55);
+}
+
 /* TODO need tests
 
 bool isCycle() const;
 bool isCycleR();
 
 void RemoveCycle();
-void Reverse();
 ListData * FindMax() const; //O(N)
 
 */
