@@ -209,3 +209,59 @@ TEST_F(ListCpp_test, SortInsertable_2)
     list.SortInsertable();
     ASSERT_TRUE(Equal({-1,-1,0,2}, list));
 }
+
+TEST_F(ListCpp_test, IsCycle_Empty)
+{
+    List<int> list;
+    ASSERT_FALSE(list.isCycle());
+}
+
+TEST_F(ListCpp_test, IsCycle_SimpleNonCycle)
+{
+    List<int> list({1,2,3});
+    ASSERT_FALSE(list.isCycle());
+}
+
+TEST_F(ListCpp_test, IsCycle_OneElement)
+{
+    List<int> list({1});
+    list.Begin()->m_next = list.Begin();
+    EXPECT_TRUE(list.isCycle());
+    list.Begin()->m_next = list.End();
+}
+
+TEST_F(ListCpp_test, IsCycle_Simple)
+{
+    List<int> list({1,2});
+    list.Begin()->m_next->m_next = list.Begin();
+    EXPECT_TRUE(list.isCycle());
+    list.Begin()->m_next->m_next = list.End();
+}
+
+TEST_F(ListCpp_test, IsCycleR_Empty)
+{
+    List<int> list;
+    ASSERT_FALSE(list.isCycleR());
+}
+
+TEST_F(ListCpp_test, IsCycleR_SimpleNonCycle)
+{
+    List<int> list({1,2,3});
+    ASSERT_FALSE(list.isCycleR());
+}
+
+TEST_F(ListCpp_test, IsCycleR_OneElement)
+{
+    List<int> list({1});
+    list.Begin()->m_next = list.Begin();
+    EXPECT_TRUE(list.isCycleR());
+    list.Begin()->m_next = list.End();
+}
+
+TEST_F(ListCpp_test, IsCycleR_Simple)
+{
+    List<int> list({1,2});
+    list.Begin()->m_next->m_next = list.Begin();
+    EXPECT_TRUE(list.isCycleR());
+    list.Begin()->m_next->m_next = list.End();
+}

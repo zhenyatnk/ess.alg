@@ -42,6 +42,7 @@ public:
         {}
         
     public:
+        bool m_visited = false;
         TypeValue m_data = {};
         ListData* m_next = nullptr;
     };
@@ -116,6 +117,11 @@ public:
     const ListData* Begin() const
     {
         return m_begin;
+    }
+    
+    ListData* End()
+    {
+        return m_end;
     }
     
     const ListData* End() const
@@ -230,6 +236,31 @@ public:
             }
         }
         *this = std::move(result);
+    }
+    
+    bool isCycle() const
+    {
+        auto current = m_begin;
+        const auto visited = !current->m_visited;
+        while(current != m_end)
+        {
+            if(current->m_visited == visited)
+                return true;
+            current->m_visited = visited;
+            current = current->m_next;
+        }
+        return false;
+    }
+    
+    bool isCycleR()
+    {
+        if(IsEmpty())
+            return false;
+        
+        Reverse();
+        auto rbegin = m_begin;
+        Reverse();
+        return rbegin == m_begin;
     }
     
 protected:
