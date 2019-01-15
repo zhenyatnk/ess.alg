@@ -263,6 +263,24 @@ public:
         return rbegin == m_begin;
     }
     
+    void RemoveCycle()
+    {
+        ListData* prev = nullptr;
+        auto current = m_begin;
+        const auto visited = !current->m_visited;
+        while(current != m_end)
+        {
+            if(current->m_visited == visited)
+            {
+                prev->m_next = m_end;
+                break;
+            }
+            current->m_visited = visited;
+            prev = current;
+            current = current->m_next;
+        }
+    }
+    
 protected:
     ListData* GetLast()
     {

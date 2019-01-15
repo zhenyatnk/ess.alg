@@ -265,3 +265,23 @@ TEST_F(ListCpp_test, IsCycleR_Simple)
     EXPECT_TRUE(list.isCycleR());
     list.Begin()->m_next->m_next = list.End();
 }
+
+
+TEST_F(ListCpp_test, RemoveCycle_Empty)
+{
+    List<int> list;
+    list.RemoveCycle();
+}
+TEST_F(ListCpp_test, RemoveCycle_NotCycle)
+{
+    List<int> list({1,2});
+    list.RemoveCycle();
+}
+
+TEST_F(ListCpp_test, RemoveCycle_Simple)
+{
+    List<int> list({1,2});
+    list.Begin()->m_next->m_next = list.Begin();
+    list.RemoveCycle();
+    ASSERT_NE(list.Begin()->m_next->m_next, list.Begin());
+}
