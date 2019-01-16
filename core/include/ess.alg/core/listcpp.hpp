@@ -187,7 +187,7 @@ public:
         List<TypeValue> result;
         while(!!m_begin)
         {
-            auto beforeMax = FindBeforeMax(m_begin, m_last);
+            auto beforeMax = FindBeforeMax(m_begin);
             if(!beforeMax) //first it is max
             {
                 auto max = m_begin;
@@ -293,12 +293,13 @@ public:
     }
     
 protected:
-    ListData* FindBeforeMax(ListData* begin, ListData* last) const //O(n)
+    ListData* FindBeforeMax(ListData* begin) const //O(n)
     {
         auto current = begin;
         auto max = begin;
         ListData* beforeMax = nullptr;
         ListData* prev = nullptr;
+        assert(!!current); //workin with only not empty list
         while(!!current)
         {
             if(max->m_data < current->m_data)
