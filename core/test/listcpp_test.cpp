@@ -285,3 +285,33 @@ TEST_F(ListCpp_test, RemoveCycle_Simple)
     list.RemoveCycle();
     ASSERT_NE(list.Begin()->m_next->m_next, list.Begin());
 }
+
+TEST_F(ListCpp_test, IsSorted_Empty)
+{
+    List<int> list;
+    ASSERT_TRUE(list.IsSorted());
+}
+
+TEST_F(ListCpp_test, IsSorted_OneElement)
+{
+    List<int> list({1});
+    ASSERT_TRUE(list.IsSorted());
+}
+
+TEST_F(ListCpp_test, IsSorted_TwoEqual)
+{
+    List<int> list({1, 1});
+    ASSERT_TRUE(list.IsSorted());
+}
+
+TEST_F(ListCpp_test, IsSorted_Sorted)
+{
+    List<int> list({1, 2});
+    ASSERT_TRUE(list.IsSorted());
+}
+
+TEST_F(ListCpp_test, IsSorted_NotSorted)
+{
+    List<int> list({2, 1});
+    ASSERT_FALSE(list.IsSorted());
+}

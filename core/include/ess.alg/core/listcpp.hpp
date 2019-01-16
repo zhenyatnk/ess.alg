@@ -280,6 +280,18 @@ public:
         }
     }
     
+    bool IsSorted() //O(n)
+    {
+        auto current = m_begin;
+        while(!!current && !!current->m_next)
+        {
+            if(current->m_data > current->m_next->m_data)
+                return false;
+            current = current->m_next;
+        }
+        return true;
+    }
+    
 protected:
     ListData* FindBeforeMax(ListData* begin, ListData* last) const //O(n)
     {
