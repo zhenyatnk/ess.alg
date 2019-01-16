@@ -26,7 +26,7 @@ namespace
         auto current = right.Begin();
         for(const auto& element: left)
         {
-            if(current == right.End() || element != current->m_data)
+            if(!current || element != current->m_data)
             {
                 std::cout << "Equal:"  << std::endl
                 << " Left: " << left << std::endl
@@ -50,7 +50,7 @@ public:
 TEST_F(ListCpp_test, Ctor_Empty)
 {
     List<int> list;
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
 }
 
 TEST_F(ListCpp_test, Empty)
@@ -78,9 +78,9 @@ TEST_F(ListCpp_test, Clear)
     List<int> list;
     list+=1;
     list+=2;
-    ASSERT_NE(list.Begin(), list.End());
+    ASSERT_NE(list.Begin(), nullptr);
     list.Clear();
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
 }
 
 TEST_F(ListCpp_test, Initializer_list_Int)
@@ -93,7 +93,7 @@ TEST_F(ListCpp_test, FindMax_Empty)
 {
     List<int> list;
     auto max = list.FindMax();
-    ASSERT_EQ(max, list.End());
+    ASSERT_EQ(max, nullptr);
 }
 
 TEST_F(ListCpp_test, FindMax_One)
@@ -142,7 +142,7 @@ TEST_F(ListCpp_test, Reverse_Empty)
 {
     List<int> list;
     list.Reverse();
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
 }
 
 TEST_F(ListCpp_test, Reverse)
@@ -155,9 +155,9 @@ TEST_F(ListCpp_test, Reverse)
 TEST_F(ListCpp_test, SortSelect_Empty)
 {
     List<int> list;
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
     list.SortSelect();
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
 }
 
 TEST_F(ListCpp_test, SortSelect_Once)
@@ -184,9 +184,9 @@ TEST_F(ListCpp_test, SortSelect_2)
 TEST_F(ListCpp_test, SortInsertable_Empty)
 {
     List<int> list;
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
     list.SortInsertable();
-    ASSERT_EQ(list.Begin(), list.End());
+    ASSERT_EQ(list.Begin(), nullptr);
 }
 
 TEST_F(ListCpp_test, SortInsertable_Once)
@@ -227,7 +227,7 @@ TEST_F(ListCpp_test, IsCycle_OneElement)
     List<int> list({1});
     list.Begin()->m_next = list.Begin();
     EXPECT_TRUE(list.isCycle());
-    list.Begin()->m_next = list.End();
+    list.Begin()->m_next = nullptr;
 }
 
 TEST_F(ListCpp_test, IsCycle_Simple)
@@ -235,7 +235,7 @@ TEST_F(ListCpp_test, IsCycle_Simple)
     List<int> list({1,2});
     list.Begin()->m_next->m_next = list.Begin();
     EXPECT_TRUE(list.isCycle());
-    list.Begin()->m_next->m_next = list.End();
+    list.Begin()->m_next->m_next = nullptr;
 }
 
 TEST_F(ListCpp_test, IsCycleR_Empty)
@@ -255,7 +255,7 @@ TEST_F(ListCpp_test, IsCycleR_OneElement)
     List<int> list({1});
     list.Begin()->m_next = list.Begin();
     EXPECT_TRUE(list.isCycleR());
-    list.Begin()->m_next = list.End();
+    list.Begin()->m_next = nullptr;
 }
 
 TEST_F(ListCpp_test, IsCycleR_Simple)
@@ -263,7 +263,7 @@ TEST_F(ListCpp_test, IsCycleR_Simple)
     List<int> list({1,2});
     list.Begin()->m_next->m_next = list.Begin();
     EXPECT_TRUE(list.isCycleR());
-    list.Begin()->m_next->m_next = list.End();
+    list.Begin()->m_next->m_next = nullptr;
 }
 
 

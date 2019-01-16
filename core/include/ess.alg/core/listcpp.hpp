@@ -19,10 +19,10 @@ public:
     {
         out << "{";
         auto current = obj.m_begin;
-        while(current != obj.m_end)
+        while(!!current)
         {
             out << current->m_data;
-            if(current->m_next != obj.m_end)
+            if(!!current->m_next)
                 out << ",";
             current = current->m_next;
         }
@@ -48,20 +48,15 @@ public:
     };
     
 public:
-    List()
-    {
-        m_begin = m_end = new ListData();
-    }
+    List() = default;
     
     List(std::initializer_list<ListData*> initializer)
-        :List()
     {
         for(const auto& element: initializer)
             *this+=element;
     }
     
     List(std::initializer_list<TypeValue> initializer)
-        :List()
     {
         for(const auto& element: initializer)
             *this+=element;
@@ -70,20 +65,19 @@ public:
     List(List && other)
     {
         m_begin = other.m_begin;
-        m_end = other.m_end;
+        m_last = other.m_last;
         
-        other.m_begin = other.m_end = new ListData();
+        other.m_begin = other.m_last = nullptr;
     }
     
     List& operator=(List&& other)
     {
         Clear();
-        delete m_end;
         
         m_begin = other.m_begin;
-        m_end = other.m_end;
+        m_last = other.m_last;
         
-        other.m_begin = other.m_end = new ListData();
+        other.m_begin = other.m_last = nullptr;
         
         return *this;
     }
@@ -91,12 +85,11 @@ public:
     ~List()
     {
         Clear();
-        delete m_end;
     }
     
     void Clear()
     {
-        while(m_begin != m_end)
+        while(!!m_begin)
         {
             auto remove = m_begin;
             m_begin = m_begin->m_next;
@@ -106,7 +99,7 @@ public:
     
     bool IsEmpty() const
     {
-        return m_begin == m_end;
+        return m_begin == nullptr;
     }
     
     ListData* Begin()
@@ -119,14 +112,14 @@ public:
         return m_begin;
     }
     
-    ListData* End()
+    ListData* Last()
     {
-        return m_end;
+        return m_last;
     }
     
-    const ListData* End() const
+    const ListData* Last() const
     {
-        return m_end;
+        return m_last;
     }
     
     List<TypeValue>& operator+=(const TypeValue& rhs)
@@ -137,16 +130,12 @@ public:
     
     List<TypeValue>& operator+=(ListData* rhs)
     {
-        auto last = GetLast();
-        if (!last)
-        {
-            rhs->m_next = m_end;
-            m_begin = rhs;
-        }
+        if(!m_begin)
+            m_begin = m_last = rhs;
         else
         {
-            last->m_next = rhs;
-            rhs->m_next = m_end;
+            m_last->m_next = rhs;
+            m_last = rhs;
         }
         return *this;
     }
@@ -159,16 +148,19 @@ public:
     void InsertFront(ListData* rhs)
     {
         rhs->m_next = m_begin;
-        m_begin = rhs;
+        if(!m_begin)
+            m_begin = m_last = rhs;
+        else
+            m_begin = rhs;
     }
     
     ListData* FindMax() const //O(n)
     {
         auto current = m_begin;
-        auto max = m_end;
-        while(current != m_end)
+        auto max = m_begin;
+        while(!!current)
         {
-            if(max == m_end || max->m_data < current->m_data)
+            if(max->m_data < current->m_data)
                 max = current;
             current = current->m_next;
         }
@@ -178,24 +170,24 @@ public:
     void Reverse()
     {
         auto current = m_begin;
-        auto prev = m_end;
-        while(current != m_end)
+        ListData* prev = nullptr;
+        while(!!current)
         {
             auto next = current->m_next;
             current->m_next = prev;
             prev = current;
             current = next;
         }
+        m_last = m_begin;
         m_begin = prev;
     }
     
     void SortSelect()//O(n*n)
     {
         List<TypeValue> result;
-        while(m_begin != m_end)
+        while(!!m_begin)
         {
-            auto beforeMax = FindBeforeMax(m_begin, m_end);
-            assert(beforeMax != m_end);
+            auto beforeMax = FindBeforeMax(m_begin, m_last);
             if(!beforeMax) //first it is max
             {
                 auto max = m_begin;
@@ -215,14 +207,14 @@ public:
     void SortInsertable()//O(n*n)
     {
         List<TypeValue> result;
-        while(m_begin != m_end)
+        while(!!m_begin)
         {
             auto insertable = m_begin;
             m_begin = m_begin->m_next;
             
             ListData* beforeFind = nullptr;
             auto current = result.Begin();
-            while(current != result.End() && current->m_data < insertable->m_data)
+            while(!!current && current->m_data < insertable->m_data)
             {
                 beforeFind = current;
                 current = current->m_next;
@@ -240,9 +232,12 @@ public:
     
     bool isCycle() const
     {
+        if(IsEmpty())
+            return false;
+        
         auto current = m_begin;
         const auto visited = !current->m_visited;
-        while(current != m_end)
+        while(!!current)
         {
             if(current->m_visited == visited)
                 return true;
@@ -265,14 +260,18 @@ public:
     
     void RemoveCycle()
     {
+        if(IsEmpty())
+            return;
+        
         ListData* prev = nullptr;
         auto current = m_begin;
         const auto visited = !current->m_visited;
-        while(current != m_end)
+        while(!!current)
         {
             if(current->m_visited == visited)
             {
-                prev->m_next = m_end;
+                m_last = prev;
+                prev->m_next = nullptr;
                 break;
             }
             current->m_visited = visited;
@@ -282,27 +281,15 @@ public:
     }
     
 protected:
-    ListData* GetLast()
-    {
-        auto current = m_begin;
-        ListData* prev = nullptr;
-        while(current != m_end)
-        {
-            prev = current;
-            current = current->m_next;
-        }
-        return prev;
-    }
-    
-    ListData* FindBeforeMax(ListData* begin, ListData* end) const //O(n)
+    ListData* FindBeforeMax(ListData* begin, ListData* last) const //O(n)
     {
         auto current = begin;
-        auto max = end;
-        auto beforeMax = end;
+        auto max = begin;
+        ListData* beforeMax = nullptr;
         ListData* prev = nullptr;
-        while(current != end)
+        while(!!current)
         {
-            if(max == end || max->m_data < current->m_data)
+            if(max->m_data < current->m_data)
             {
                 beforeMax = prev;
                 max = current;
@@ -314,8 +301,8 @@ protected:
     }
     
 private:
-    ListData* m_begin;
-    ListData* m_end;
+    ListData* m_begin = nullptr;
+    ListData* m_last = nullptr;
 };
     
 }    
