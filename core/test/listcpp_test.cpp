@@ -1,9 +1,9 @@
-#include <ess.alg/core/listcpp.hpp>
+#include <ess.alg/core/listcpp.h>
 
 #include <gtest/gtest.h>
 
 //--------------------------------------------------
-using namespace ess_alg::core::cppstyle;
+using namespace ess_alg::core;
 
 namespace
 {

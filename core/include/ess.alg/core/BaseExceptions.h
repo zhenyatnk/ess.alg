@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ess.alg/core/export.hpp>
+#include <ess.alg/core/export.h>
 #include <stdexcept>
 
 namespace ess_alg {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ess.alg/core/BaseExceptions.hpp>
-#include <ess.alg/core/export.hpp>
+#include <ess.alg/core/BaseExceptions.h>
+#include <ess.alg/core/export.h>
 
 #include <functional>
 #include <ostream>
@@ -9,7 +9,6 @@
 
 namespace ess_alg {
 namespace core {
-namespace cppstyle{
 
 template<class TypeValue>
 class List final
@@ -317,7 +316,6 @@ private:
     ListData* m_begin = nullptr;
     ListData* m_last = nullptr;
 };
-    
-}    
+      
 }
 }
