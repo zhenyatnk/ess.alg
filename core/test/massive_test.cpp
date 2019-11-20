@@ -1,4 +1,4 @@
-#include <ess.alg/core/listcpp.h>
+#include <ess.alg/core/massive.h>
 
 #include <gtest/gtest.h>
 
@@ -13,7 +13,15 @@ public:
     {}
 };
 
-TEST_F(Massive_test, Empty)
+TEST_F(Massive_test, median_empty)
 {
-
+    ASSERT_EQ(0, FindMedian(std::vector<int>{}));
+}
+TEST_F(Massive_test, median_duplicate)
+{
+    ASSERT_EQ(0, FindMedian(std::vector<int>{5,5,5,5})); // problem alghoritm
+}
+TEST_F(Massive_test, median)
+{
+    ASSERT_EQ(7, FindMedian(std::vector<int>{1,3,4,7,8,8,9}));
 }
